@@ -242,26 +242,28 @@ services:
       retries: 120
 
   spark-master:
-    image: bitnami/spark:latest
+    image: spark-image
+    container_name: spark-master
+    command: ["spark-class", "org.apache.spark.deploy.master.Master"]
     ports:
-      - "9304:7077"
-      - "9305:8080"
-    environment:
-      - SPARK_MODE=master
-      - SPARK_MASTER_HOST=spark-master
-      - SPARK_MASTER_PORT=7077
-      - SPARK_LOCAL_IP=spark-master
-      - SPARK_NETWORK_MAXFRAMESIZE=64m # Set max frame size
+      - "9305:8080"  # Spark Master web UI
     networks:
       - elastic
 
-  spark-worker:
-    image: bitnami/spark:latest
+  spark-worker1:
+    image: spark-image
+    container_name: spark-worker1
+    command: ["spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
     depends_on:
       - spark-master
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER=spark://spark-master:7077
-      - SPARK_NETWORK_MAXFRAMESIZE=64m # Set max frame size
+    networks:
+      - elastic
+
+  spark-worker2:
+    image: spark-image
+    container_name: spark-worker2
+    command: ["spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+    depends_on:
+      - spark-master
     networks:
       - elastic

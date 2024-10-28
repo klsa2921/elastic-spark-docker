@@ -1,0 +1,22 @@
+# Use a base image with Java (Spark requires Java)
+FROM openjdk:11-jre-slim
+
+# Set environment variables
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$SPARK_HOME/bin:$PATH
+
+# Create a directory for Spark
+RUN mkdir -p $SPARK_HOME
+
+# Copy the extracted Spark folder into the container
+COPY spark-3.3.3-bin-hadoop3 $SPARK_HOME
+
+# Set executable permissions for Spark binaries
+#RUN chmod +x $SPARK_HOME/bin/*
+RUN chmod 777 -R $SPARK_HOME
+
+# Set the working directory
+WORKDIR $SPARK_HOME
+
+# Command to run Spark
+CMD ["spark-shell"]
